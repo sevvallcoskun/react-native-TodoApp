@@ -1,27 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, FlatList } from 'react-native';
+import Header from './components/header'
+import TodoItem from './components/todoItem'
+import AddTodo from './components/addTodo';
 
 export default function App() {
-  const [name,setName]=useState('Sevval');
-  const [age,setAge]=useState('21');
+  const [todos,setTodos]=useState([
+    {text:'buy coffee', key:'1'},
+    {text:'drink coffee', key:'2'},
+    {text:'be coffee', key:'3'}]);
+
+    const pressHandler=(key)=>{
+      setTodos((prevTodos)=>{
+        return prevTodos.filter(todo=>todo.key!=key);
+      });
+    }
+    const submitHandler=(text)=>{
+      setTodos((prevTodos)=>{
+        return[
+          {text:text,key:Math.random().toString()},
+          ...prevTodos
+        ];
+      })
+    }
   
   return (
     <View style={styles.container}>
-      <Text>Enter name:</Text>
-      <TextInput 
-        style={styles.input}
-        placeholder='e.g. John Doe'
-        onChangeText={(val)=>setName(val)} 
-      />
-      <Text>Enter age:</Text>
-      <TextInput 
-        keyboardType='numeric'
-        style={styles.input}
-        placeholder='e.g. 32'
-        onChangeText={(val)=>setAge(val)} 
-      />
-      <Text>Name:{name}, Age:{age}</Text>
+      <Header />
+      <View style={styles.content}>
+        <AddTodo submitHandler={submitHandler}/>
+        <View style={styles.list}>
+          <FlatList
+            data={todos}
+            renderItem={({item})=>(
+              <TodoItem item={item} pressHandler={pressHandler}/>
+            )}         
+          />
+        </View>
+      </View>
     </View>
   );
 }
@@ -30,14 +46,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  input:{
-    borderWidth:1,
-    borderColor:'#777',
-    padding:8,
-    margin:10,
-    width:200
+  content:{
+    padding:40,
+  },
+  list:{
+    marginTop:20
   }
 });
